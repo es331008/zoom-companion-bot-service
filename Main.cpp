@@ -8,6 +8,7 @@
 #include <locale>
 #include <codecvt>
 #include <Windows.h>
+#include <future>
 
 #include "ZoomAuthEventHandler.h"
 #include "Globals.h"
@@ -126,25 +127,39 @@ static void configureRoutes(Server& svr) {
             cout << "[Mtng] Attempting to join meeting: " << meetingId << endl;
         
             // Do this is another thread with unique meeting service
-            tagJoinParam joinParam;
-            joinParam.userType = SDK_UT_WITHOUT_LOGIN;
-            
-            JoinParam4WithoutLogin& withoutloginParam = joinParam.param.withoutloginuserJoin;
-            withoutloginParam.meetingNumber = meetingId;
-            withoutloginParam.userName = L"Botley";
-            withoutloginParam.psw = L"220464";
+            promise<bool> botPromise;
+            future<bool> botFuture = botPromise.get_future();
+            thread meetingBotThread([meetingId, &botPromise] {
+                tagJoinParam joinParam;
+                joinParam.userType = SDK_UT_WITHOUT_LOGIN;
 
-            SDKError joinMeetingCallReturnValue = g_meetingService->Join(joinParam);
-            if (joinMeetingCallReturnValue == SDKError::SDKERR_SUCCESS)
-            {
-                cout << "[Mtng] Join meeting call succeeded" << endl;
+                JoinParam4WithoutLogin& withoutloginParam = joinParam.param.withoutloginuserJoin;
+                withoutloginParam.meetingNumber = meetingId;
+                withoutloginParam.userName = L"Botley";
+                withoutloginParam.psw = L"220464";
+
+                SDKError joinMeetingCallReturnValue = g_meetingService->Join(joinParam);
+                if (joinMeetingCallReturnValue == SDKError::SDKERR_SUCCESS)
+                {
+                    cout << "[Mtng] Join meeting call succeeded" << endl;
+                    botPromise.set_value(true);
+                }
+                else {
+                    cout << "[Mtng] Join meeting call failed with error: " << joinMeetingCallReturnValue << endl;
+                    botPromise.set_value(false);
+                }
+            });
+            
+            if (botFuture.get()) {
+                meetingBotThread.detach();
+                res.status = 200;
+                res.set_content("Joined meeting!", "text/plain");
             }
             else {
-                cout << "[Mtng] Join meeting call failed with error: " << joinMeetingCallReturnValue << endl;
+                meetingBotThread.join();
+                res.status = 500;
+                res.set_content("Failed to join meeting", "text/plain");
             }
-
-            res.status = 200;
-            res.set_content("Joining meeting!", "text/plain");
         }
         catch (const exception& ex) {
             res.status = 500;
