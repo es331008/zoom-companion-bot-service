@@ -13,11 +13,16 @@
 #include "zoom_sdk.h"
 #include "./events/ZoomAuthEventHandler.h"
 #include "./events/ZoomMeetingEventHandler.h"
+#include "./events/MeetingRecordingCtrlEventHandler.h"
+#include "ZoomSDKAudioRawDataDelegate.h"
 
 #include "zoom_sdk_def.h"
 #include "json.hpp"
 #include "meeting_service_interface.h"
 #include "meeting_service_components/meeting_chat_interface.h"
+#include "meeting_service_components/meeting_recording_interface.h"
+#include "rawdata/rawdata_audio_helper_interface.h"
+#include "rawdata/zoom_rawdata_api.h"
 #include "auth_service_interface.h"
 
 using namespace std;
@@ -37,13 +42,27 @@ class Zoom : public Singleton<Zoom> {
 
     IAuthService* m_authService;
     IMeetingService* m_meetingService;
+    IZoomSDKAudioRawDataHelper* m_audioHelper;
+    ZoomSDKAudioRawDataDelegate* m_audioSource;
 
     SDKError createServices();
     void getAuthJwt();
 
+    function<void(bool)> onRecordingPrivilegeChanged = [&](bool canRec) {
+        if (canRec)
+            startRawRecording();
+        else
+            stopRawRecording();
+    };
+
     function<void()> onJoin = [&]() {
         Log::success("Joined meeting!");
         sendWelcomeChat();
+
+        IMeetingRecordingController* recordingCtrl = m_meetingService->GetMeetingRecordingController();
+        IMeetingRecordingCtrlEvent* recordingEvent = new MeetingRecordingCtrlEventHandler(onRecordingPrivilegeChanged);
+        recordingCtrl->SetEvent(recordingEvent);
+        startRawRecording();
     };
 
 public:
@@ -55,6 +74,8 @@ public:
     SDKError leave();
 
     SDKError sendWelcomeChat();
+    SDKError startRawRecording();
+    SDKError stopRawRecording();
 
     SDKError clean();
 

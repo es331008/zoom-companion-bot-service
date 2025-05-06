@@ -57,13 +57,12 @@ static void runMessagePump() {
     Log::info("Starting message pump");
 
     MSG msg;
-    while (true) {
-        while (GetMessage(&msg, nullptr, 0, 0)) {
-            TranslateMessage(&msg);
-            DispatchMessage(&msg);
-        }
-        this_thread::sleep_for(chrono::milliseconds(10));
+    while (GetMessage(&msg, nullptr, 0, 0)) {
+        TranslateMessage(&msg);
+        DispatchMessage(&msg);
     }
+
+    Log::info("Message pump ended");
 }
 
 static void onExit() {
