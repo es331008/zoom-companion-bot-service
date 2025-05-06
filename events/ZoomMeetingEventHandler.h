@@ -1,20 +1,18 @@
-#pragma once
+#ifndef ZOOMMEETINGEVENTHANDLER_H
+#define ZOOMMEETINGEVENTHANDLER_H
 
+// This shouldn't be needed but for whatever reason, it'll try to build with Unix if it's not included here
 #include "httplib.h"
-#include "zoom_sdk.h"
-#include "zoom_sdk_def.h"
-#include "json.hpp"
+
 #include "meeting_service_interface.h"
-#include "auth_service_interface.h"
-#include <string>
-#include <locale>
-#include <codecvt>
-#include <Windows.h>
+#include "../util/Log.h"
 
 using namespace ZOOM_SDK_NAMESPACE;
 using namespace std;
 
 class ZoomMeetingEventHandler : public IMeetingServiceEvent {
+    function<void()> m_onMeetingJoin;
+
 public:
     ZoomMeetingEventHandler();
     ~ZoomMeetingEventHandler();
@@ -26,4 +24,8 @@ public:
     void onAICompanionActiveChangeNotice(bool bActive) override;
     void onMeetingTopicChanged(const zchar_t* sTopic) override;
     void onMeetingFullToWatchLiveStream(const zchar_t* sLiveStreamUrl) override;
+
+    void setOnMeetingJoin(const function<void()>& callback);
 };
+
+#endif // ZOOMMEETINGEVENTHANDLER_H

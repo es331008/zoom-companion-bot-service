@@ -4,10 +4,8 @@ ZoomMeetingEventHandler::ZoomMeetingEventHandler() {}
 ZoomMeetingEventHandler::~ZoomMeetingEventHandler() {}
 
 void ZoomMeetingEventHandler::onMeetingStatusChanged(MeetingStatus status, int iResult) {
-    cout << "[Mtng] Meeting status changed: " << status << ", result: " << iResult << endl;
-
     if (status == MEETING_STATUS_INMEETING) {
-        wcout << L"[Meeting] We're now fully in the meeting!" << endl;
+        m_onMeetingJoin();
     }
 }
 
@@ -17,3 +15,7 @@ void ZoomMeetingEventHandler::onSuspendParticipantsActivities() {}
 void ZoomMeetingEventHandler::onAICompanionActiveChangeNotice(bool bActive) {}
 void ZoomMeetingEventHandler::onMeetingTopicChanged(const zchar_t* sTopic) {}
 void ZoomMeetingEventHandler::onMeetingFullToWatchLiveStream(const zchar_t* sLiveStreamUrl) {}
+
+void ZoomMeetingEventHandler::setOnMeetingJoin(const function<void()>& callback) {
+    m_onMeetingJoin = callback;
+}

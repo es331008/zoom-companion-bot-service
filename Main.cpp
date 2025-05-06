@@ -1,89 +1,10 @@
-﻿#include "httplib.h"
+﻿#include <csignal>
+
+#include "Zoom.h"
+
+#include "httplib.h"
 #include "zoom_sdk.h"
 #include "zoom_sdk_def.h"
-#include "json.hpp"
-#include "meeting_service_interface.h"
-#include "auth_service_interface.h"
-#include <string>
-#include <locale>
-#include <codecvt>
-#include <Windows.h>
-#include <future>
-
-#include "ZoomAuthEventHandler.h"
-#include "Globals.h"
-
-using json = nlohmann::json;
-using namespace ZOOM_SDK_NAMESPACE;
-using namespace httplib;
-using namespace std;
-
-static IAuthServiceEvent* g_authEventHandler;
-
-static bool initZoomSDK() {
-    InitParam initParam;
-    initParam.strWebDomain = L"https://zoom.us";
-    initParam.enableLogByDefault = true;
-
-    printf("[Init] Starting initialization of Zoom SDK...\n");
-
-    SDKError err = InitSDK(initParam);
-
-    if (err != SDKERR_SUCCESS) {
-        printf("[Init] InitSDK failed with error: %d\n", err);
-        return false;
-    }
-
-    printf("[Init] Zoom SDK initialized successfully!\n");
-    return true;
-}
-
-static wstring getAuthJwt() {
-    Client httpClient("localhost", 5000);
-    auto response = httpClient.Get("/api/generate-sdk-jwt");
-    if (response && response->status == 200) {
-        json responseJson = json::parse(response->body);
-        if (responseJson.contains("jwt") && responseJson["jwt"].is_string()) {
-            string jwtStr = responseJson["jwt"];
-            wstring_convert<codecvt_utf8_utf16<wchar_t>> converter;
-            return converter.from_bytes(jwtStr);
-        }
-        else {
-            cerr << "[Auth] Missing or invalid 'jwt' field in response." << endl;
-            return {};
-        }
-    }
-    else {
-        cerr << "[Auth] Request failed with status : " << response->status << endl;
-    }
-}
-
-static bool authZoomSDK(const wstring& jwt_token) {
-    SDKError authServiceInitReturnVal = CreateAuthService(&g_authService);
-    if (authServiceInitReturnVal == SDKError::SDKERR_SUCCESS) {
-        cout << "[Auth] Auth service created " << endl;
-    }
-    else {
-        cerr << "[Auth] Failed to create auth service: " << authServiceInitReturnVal << endl;
-        return false;
-    }
-
-    g_authEventHandler = new ZoomAuthEventHandler();
-    g_authService->SetEvent(g_authEventHandler);
-
-    AuthContext authContext;
-    authContext.jwt_token = jwt_token.c_str();
-    if (g_authService) {
-        SDKError err = g_authService->SDKAuth(authContext);
-        if (err != SDKERR_SUCCESS) {
-            printf("[Auth] SDKAuth failed with error: %d\n", err);
-            return false;
-        }
-
-        printf("[Auth] Zoom SDK authentication started\n");
-    }
-    return true;
-}
 
 static void addCORS(Server& svr) {
     svr.Options(R"(.*)", [](const Request& req, Response& res) {
@@ -105,61 +26,25 @@ static void addCORS(Server& svr) {
 }
 
 static void configureRoutes(Server& svr) {
-    svr.Post("/api/join_meeting", [](const Request& req, Response& res) {
-        if (!g_isAuthenticated || !g_meetingService) {
-            cerr << "[Mtng] Zoom SDK not fully ready" << endl;
-            res.status = 503;
-            res.set_content("Zoom SDK not ready yet", "text/plain");
-            return;
-        }
-
+    svr.Post("/api/bot/join-meeting", [](const Request& req, Response& res) {
         try {
             json requestBody = json::parse(req.body);
 
-            if (requestBody.find("meetingId") == requestBody.end()) {
+            if (requestBody.find("joinUrl") == requestBody.end()) {
                 res.status = 400;
-                res.set_content("Error: Missing 'meetingId' in request body", "text/plain");
+                res.set_content("Error: Missing 'joinUrl' in request body", "text/plain");
                 return;
             }
 
-            int64_t meetingId = requestBody["meetingId"];
+            string joinUrl = requestBody["joinUrl"];
 
-            cout << "[Mtng] Attempting to join meeting: " << meetingId << endl;
+            Log::info("Attempting to join meeting: " + joinUrl);
         
-            // Do this is another thread with unique meeting service
-            promise<bool> botPromise;
-            future<bool> botFuture = botPromise.get_future();
-            thread meetingBotThread([meetingId, &botPromise] {
-                tagJoinParam joinParam;
-                joinParam.userType = SDK_UT_WITHOUT_LOGIN;
-
-                JoinParam4WithoutLogin& withoutloginParam = joinParam.param.withoutloginuserJoin;
-                withoutloginParam.meetingNumber = meetingId;
-                withoutloginParam.userName = L"Botley";
-                withoutloginParam.psw = L"220464";
-
-                SDKError joinMeetingCallReturnValue = g_meetingService->Join(joinParam);
-                if (joinMeetingCallReturnValue == SDKError::SDKERR_SUCCESS)
-                {
-                    cout << "[Mtng] Join meeting call succeeded" << endl;
-                    botPromise.set_value(true);
-                }
-                else {
-                    cout << "[Mtng] Join meeting call failed with error: " << joinMeetingCallReturnValue << endl;
-                    botPromise.set_value(false);
-                }
-            });
+            auto* zoom = &Zoom::getInstance();
+            zoom->join(joinUrl);
             
-            if (botFuture.get()) {
-                meetingBotThread.detach();
-                res.status = 200;
-                res.set_content("Joined meeting!", "text/plain");
-            }
-            else {
-                meetingBotThread.join();
-                res.status = 500;
-                res.set_content("Failed to join meeting", "text/plain");
-            }
+            res.status = 200;
+            res.set_content("Joined meeting!", "text/plain");
         }
         catch (const exception& ex) {
             res.status = 500;
@@ -169,7 +54,7 @@ static void configureRoutes(Server& svr) {
 }
 
 static void runMessagePump() {
-    cout << "[MPmp] Starting message pump" << endl;
+    Log::info("Starting message pump");
 
     MSG msg;
     while (true) {
@@ -181,18 +66,47 @@ static void runMessagePump() {
     }
 }
 
+static void onExit() {
+    auto* zoom = &Zoom::getInstance();
+    zoom->leave();
+    zoom->clean();
+
+    Log::info("Exiting...");
+}
+
+static void onSignal(int signal) {
+    onExit();
+    _Exit(signal);
+}
+
+static SDKError run() {
+    SDKError err{ SDKERR_SUCCESS };
+    auto* zoom = &Zoom::getInstance();
+
+    signal(SIGINT, onSignal);
+    signal(SIGTERM, onSignal);
+
+    atexit(onExit);
+
+    err = zoom->init();
+    if (Zoom::hasError(err, "SDK initialization complete"))
+        return err;
+
+    err = zoom->auth();
+    if (Zoom::hasError(err, "SDK authentication started"))
+        return err;
+
+    return err;
+}
+
 int main()
 {
-    if (!initZoomSDK()) {
-        return -1;
-    }
+    SDKError err = run();
 
-    wstring jwt = getAuthJwt();
-    if (!authZoomSDK(jwt)) {
-        return -1;
-    }
+    if (Zoom::hasError(err))
+        Log::error("error");
 
-    // Message pumps runs on the main thread
+    // Message pump runs on the main thread
     thread serverThread([]() {
         Server svr;
         addCORS(svr);
@@ -200,7 +114,7 @@ int main()
 
         this_thread::sleep_for(chrono::seconds(2));
 
-        printf("[Srvr] Starting API server on port 5002...\n");
+        Log::info("Starting API server on port 5002...");
         svr.listen("0.0.0.0", 5002);
         });
     serverThread.detach();
