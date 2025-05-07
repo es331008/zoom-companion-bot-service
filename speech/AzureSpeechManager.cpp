@@ -1,5 +1,4 @@
 #include "AzureSpeechManager.h"
-#include <iostream>
 
 using namespace Microsoft::CognitiveServices::Speech;
 using namespace Microsoft::CognitiveServices::Speech::Audio;

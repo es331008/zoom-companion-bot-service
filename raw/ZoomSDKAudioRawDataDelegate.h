@@ -10,7 +10,7 @@
 #include "rawdata/rawdata_audio_helper_interface.h"
 
 #include "../util/Log.h"
-#include "AzureSpeechManager.h"
+#include "../speech/AzureSpeechManager.h"
 
 using namespace std;
 using namespace ZOOMSDK;

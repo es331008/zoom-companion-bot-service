@@ -1,9 +1,11 @@
-#pragma once
+#ifndef AZURE_SPEECH_MANAGER_H
+#define AZURE_SPEECH_MANAGER_H
 
 #include <speechapi_cxx.h>
 #include <memory>
 #include <mutex>
-#include "./util/Singleton.h"
+#include <iostream>
+#include "../util/Singleton.h"
 
 using namespace std;
 
@@ -28,3 +30,5 @@ private:
     shared_ptr<Microsoft::CognitiveServices::Speech::Audio::AudioConfig> audioConfig_;
     shared_ptr<Microsoft::CognitiveServices::Speech::SpeechRecognizer> recognizer_;
 };
+
+#endif // AZURE_SPEECH_MANAGER_H

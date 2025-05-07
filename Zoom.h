@@ -1,8 +1,6 @@
 #ifndef ZOOM_H
 #define ZOOM_H
 
-
-
 #include <string>
 #include <locale>
 #include <codecvt>
@@ -18,8 +16,8 @@
 #include "./events/ZoomMeetingEventHandler.h"
 #include "./events/MeetingRecordingCtrlEventHandler.h"
 #include "./events/ZoomMeetingChatCtrlEventHandler.h"
-#include "ZoomSDKAudioRawDataDelegate.h"
-#include "MeetingInfo.h"
+#include "./raw/ZoomSDKAudioRawDataDelegate.h"
+#include "./structs/MeetingInfo.h"
 
 #include "json.hpp"
 #include "zoom_sdk_def.h"

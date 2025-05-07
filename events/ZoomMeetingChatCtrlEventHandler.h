@@ -9,7 +9,7 @@
 
 #include "meeting_service_components/meeting_chat_interface.h"
 #include "../util/Log.h"
-#include "../MeetingInfo.h"
+#include "../structs/MeetingInfo.h"
 #include "../Zoom.h"
 
 using namespace ZOOM_SDK_NAMESPACE;

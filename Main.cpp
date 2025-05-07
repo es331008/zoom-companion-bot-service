@@ -1,7 +1,7 @@
 ﻿#include <csignal>
 
 #include "Zoom.h"
-#include "AzureSpeechManager.h"
+#include "./speech/AzureSpeechManager.h"
 
 #include "httplib.h"
 #include "zoom_sdk.h"
