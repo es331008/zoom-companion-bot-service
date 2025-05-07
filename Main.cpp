@@ -1,6 +1,7 @@
 ﻿#include <csignal>
 
 #include "Zoom.h"
+#include "AzureSpeechManager.h"
 
 #include "httplib.h"
 #include "zoom_sdk.h"
@@ -69,6 +70,7 @@ static void onExit() {
     auto* zoom = &Zoom::getInstance();
     zoom->leave();
     zoom->clean();
+    AzureSpeechManager::getInstance().shutdown();
 
     Log::info("Exiting...");
 }
@@ -104,6 +106,8 @@ int main()
 
     if (Zoom::hasError(err))
         Log::error("error");
+
+    AzureSpeechManager::getInstance().initialize("9dOvrKeS2L1GhSCfcTrGlfrfNYn1bTg3ymEBPtM6e1jreJiRVw9jJQQJ99BEACYeBjFXJ3w3AAAYACOGh7to", "eastus");
 
     // Message pump runs on the main thread
     thread serverThread([]() {

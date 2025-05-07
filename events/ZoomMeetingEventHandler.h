@@ -6,6 +6,7 @@
 
 #include "meeting_service_interface.h"
 #include "../util/Log.h"
+#include "../Zoom.h"
 
 using namespace ZOOM_SDK_NAMESPACE;
 using namespace std;

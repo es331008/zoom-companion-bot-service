@@ -1,11 +1,11 @@
 #include "ZoomSDKAudioRawDataDelegate.h"
 
 void ZoomSDKAudioRawDataDelegate::onMixedAudioRawDataReceived(AudioRawData* data) {
-    std::cout << "[AudioRawData] Capturing mixed audio: "
-        << "Sample Rate = " << data->GetSampleRate()
-        << ", Channel Num = " << data->GetChannelNum()
-        << ", Data Size = " << data->GetBufferLen()
-        << std::endl;
+    // Convert audio here to azure format
+
+    auto buffer = data->GetBuffer();
+    auto size = data->GetBufferLen();
+    //AzureSpeechManager::getInstance().pushAudio(reinterpret_cast<uint8_t*>(buffer), size);
 }
 
 void ZoomSDKAudioRawDataDelegate::onOneWayAudioRawDataReceived(AudioRawData* data, uint32_t node_id) {

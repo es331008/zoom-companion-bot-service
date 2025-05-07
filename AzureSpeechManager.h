@@ -1,0 +1,30 @@
+#pragma once
+
+#include <speechapi_cxx.h>
+#include <memory>
+#include <mutex>
+#include "./util/Singleton.h"
+
+using namespace std;
+
+class AzureSpeechManager : public Singleton<AzureSpeechManager>
+{
+    friend class Singleton<AzureSpeechManager>;
+
+public:
+    void initialize(const string& key, const string& region);
+    void pushAudio(uint8_t* data, size_t size);
+    void shutdown();
+
+private:
+    AzureSpeechManager();
+    ~AzureSpeechManager();
+
+    mutex mutex_;
+    bool initialized_ = false;
+
+    shared_ptr<Microsoft::CognitiveServices::Speech::SpeechConfig> config_;
+    shared_ptr<Microsoft::CognitiveServices::Speech::Audio::PushAudioInputStream> stream_;
+    shared_ptr<Microsoft::CognitiveServices::Speech::Audio::AudioConfig> audioConfig_;
+    shared_ptr<Microsoft::CognitiveServices::Speech::SpeechRecognizer> recognizer_;
+};

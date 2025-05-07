@@ -134,10 +134,12 @@ SDKError Zoom::clean() {
     return CleanUPSDK();
 }
 
-SDKError Zoom::sendWelcomeChat() {
+SDKError Zoom::registerChatHandlerAndSendWelcome() {
     IMeetingChatController* meetingChatController = m_meetingService->GetMeetingChatController();
+    meetingChatController->SetEvent(new ZoomMeetingChatCtrlEventHandler());
+
     IChatMsgInfoBuilder* chatMsgInfoBuilder = meetingChatController->GetChatMessageBuilder();
-    chatMsgInfoBuilder->SetContent(L"Hi everyone! I'm Meeting Bot — a virtual assistant here to help monitor and support today's session. I'm not a real participant, but I'm here to observe, take notes, or assist with automated tasks if needed. Let me know if there's anything you'd like me to pass along!");
+    chatMsgInfoBuilder->SetContent(L"Hi everyone! I'm Meeting Bot, a virtual assistant here to help monitor and support today's session. I'm not a real participant, but I'm here to observe, take notes, or assist with automated tasks if needed. Let me know if there's anything you'd like me to pass along!");
     chatMsgInfoBuilder->SetMessageType(SDKChatMessageType_To_All);
     return meetingChatController->SendChatMsgTo(chatMsgInfoBuilder->Build());
 }

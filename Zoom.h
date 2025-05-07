@@ -1,6 +1,8 @@
 #ifndef ZOOM_H
 #define ZOOM_H
 
+
+
 #include <string>
 #include <locale>
 #include <codecvt>
@@ -10,17 +12,22 @@
 #include "util/Log.h"
 
 #include "httplib.h"
+
 #include "zoom_sdk.h"
 #include "./events/ZoomAuthEventHandler.h"
 #include "./events/ZoomMeetingEventHandler.h"
 #include "./events/MeetingRecordingCtrlEventHandler.h"
+#include "./events/ZoomMeetingChatCtrlEventHandler.h"
 #include "ZoomSDKAudioRawDataDelegate.h"
+#include "MeetingInfo.h"
 
-#include "zoom_sdk_def.h"
 #include "json.hpp"
+#include "zoom_sdk_def.h"
+
 #include "meeting_service_interface.h"
 #include "meeting_service_components/meeting_chat_interface.h"
 #include "meeting_service_components/meeting_recording_interface.h"
+//#include "meeting_service_components/meeting_participants_ctrl_interface.h"
 #include "rawdata/rawdata_audio_helper_interface.h"
 #include "rawdata/zoom_rawdata_api.h"
 #include "auth_service_interface.h"
@@ -48,6 +55,15 @@ class Zoom : public Singleton<Zoom> {
     SDKError createServices();
     void getAuthJwt();
 
+    // Again, this should be centralized
+    static string zcharToString(const zchar_t* zstr) {
+        if (!zstr) return "";
+
+        std::wstring wstr(zstr);
+        std::wstring_convert<std::codecvt_utf8<wchar_t>> converter;
+        return converter.to_bytes(wstr);
+    }
+
     function<void(bool)> onRecordingPrivilegeChanged = [&](bool canRec) {
         if (canRec)
             startRawRecording();
@@ -57,15 +73,22 @@ class Zoom : public Singleton<Zoom> {
 
     function<void()> onJoin = [&]() {
         Log::success("Joined meeting!");
-        sendWelcomeChat();
+        registerChatHandlerAndSendWelcome();
 
-        IMeetingRecordingController* recordingCtrl = m_meetingService->GetMeetingRecordingController();
-        IMeetingRecordingCtrlEvent* recordingEvent = new MeetingRecordingCtrlEventHandler(onRecordingPrivilegeChanged);
-        recordingCtrl->SetEvent(recordingEvent);
-        startRawRecording();
+        // Set meeting info
+        meetingInfo.meetingNumber = to_string(m_meetingService->GetMeetingInfo()->GetMeetingNumber());
+        meetingInfo.meetingTopic = zcharToString(m_meetingService->GetMeetingInfo()->GetMeetingTopic());
+
+        //IMeetingRecordingController* recordingCtrl = m_meetingService->GetMeetingRecordingController();
+        //IMeetingRecordingCtrlEvent* recordingEvent = new MeetingRecordingCtrlEventHandler(onRecordingPrivilegeChanged);
+        //recordingCtrl->SetEvent(recordingEvent);
+        //startRawRecording();
     };
 
 public:
+    // This stuff should be cleared whenever a new meeting is joined
+    MeetingInfo meetingInfo;
+
     Zoom();
     SDKError init();
     SDKError auth();
@@ -73,7 +96,7 @@ public:
     SDKError join(string joinUrl);
     SDKError leave();
 
-    SDKError sendWelcomeChat();
+    SDKError registerChatHandlerAndSendWelcome();
     SDKError startRawRecording();
     SDKError stopRawRecording();
 
