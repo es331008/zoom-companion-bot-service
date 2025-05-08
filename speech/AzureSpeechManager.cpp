@@ -22,6 +22,8 @@ void AzureSpeechManager::initialize(const string& key, const string& region)
 
     recognizer_->Recognized.Connect([](const auto& e) {
         cout << "[Azure Recognized] " << e.Result->Text << endl;
+
+        recognizedText.push_back(e.Result->Text);
     });
 
     recognizer_->StartContinuousRecognitionAsync().get();

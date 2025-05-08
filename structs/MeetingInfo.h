@@ -16,6 +16,7 @@ struct MeetingInfo {
     string meetingTopic;
 
     vector<ChatMessage> chatHistory;
+    string meetingSummary;
 };
 
 void to_json(json& j, const MeetingInfo& meetingInfo);

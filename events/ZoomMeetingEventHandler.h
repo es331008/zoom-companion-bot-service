@@ -1,12 +1,15 @@
 #ifndef ZOOMMEETINGEVENTHANDLER_H
 #define ZOOMMEETINGEVENTHANDLER_H
 
+#include <fstream>
+
 // This shouldn't be needed but for whatever reason, it'll try to build with Unix if it's not included here
 #include "httplib.h"
 
 #include "meeting_service_interface.h"
 #include "../util/Log.h"
 #include "../Zoom.h"
+#include "../Globals.h"
 
 using namespace ZOOM_SDK_NAMESPACE;
 using namespace std;

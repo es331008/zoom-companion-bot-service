@@ -1,11 +1,13 @@
 #ifndef AZURE_SPEECH_MANAGER_H
 #define AZURE_SPEECH_MANAGER_H
 
+// This is likely setting the ssl flag off on httplib
 #include <speechapi_cxx.h>
 #include <memory>
 #include <mutex>
 #include <iostream>
 #include "../util/Singleton.h"
+#include "../Globals.h"
 
 using namespace std;
 

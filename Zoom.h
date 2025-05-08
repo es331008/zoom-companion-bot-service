@@ -77,15 +77,16 @@ class Zoom : public Singleton<Zoom> {
         meetingInfo.meetingNumber = to_string(m_meetingService->GetMeetingInfo()->GetMeetingNumber());
         meetingInfo.meetingTopic = zcharToString(m_meetingService->GetMeetingInfo()->GetMeetingTopic());
 
-        //IMeetingRecordingController* recordingCtrl = m_meetingService->GetMeetingRecordingController();
-        //IMeetingRecordingCtrlEvent* recordingEvent = new MeetingRecordingCtrlEventHandler(onRecordingPrivilegeChanged);
-        //recordingCtrl->SetEvent(recordingEvent);
-        //startRawRecording();
+        IMeetingRecordingController* recordingCtrl = m_meetingService->GetMeetingRecordingController();
+        IMeetingRecordingCtrlEvent* recordingEvent = new MeetingRecordingCtrlEventHandler(onRecordingPrivilegeChanged);
+        recordingCtrl->SetEvent(recordingEvent);
+        startRawRecording();
     };
 
 public:
     // This stuff should be cleared whenever a new meeting is joined
     MeetingInfo meetingInfo;
+    vector<string> recognizedText;
 
     Zoom();
     SDKError init();
