@@ -1,0 +1,21 @@
+{
+    "chatHistory": [
+        {
+            "message": "Hi everyone! I'm Meeting Bot, a virtual assistant here to help monitor and support today's session. I'm not a real participant, but I'm here to observe, take notes, or assist with automated tasks if needed. Let me know if there's anything you'd like me to pass along!",
+            "receiverId": 0,
+            "senderId": 16781312,
+            "senderName": "Meeting Bot",
+            "timestamp": "1746807377"
+        },
+        {
+            "message": "Don't let me forget to schedule my cat's birthday party!",
+            "receiverId": 0,
+            "senderId": 16778240,
+            "senderName": "Evan Sorger",
+            "timestamp": "1746807438"
+        }
+    ],
+    "meetingNumber": "6182556508",
+    "meetingSummary": "This meeting seems to lack any business-related discussion. Meeting Bot introduced itself to those present in the meeting. Evan Sorger made a comment regarding scheduling a cat birthday party.\n\n*   No action items are discernable from the provided transcripts.",
+    "meetingTopic": "Evan Sorger's Personal Meeting Room"
+}

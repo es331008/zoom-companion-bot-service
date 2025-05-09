@@ -11,6 +11,7 @@ using json = nlohmann::json;
 
 struct ChatMessage {
     string senderName;
+    int senderId;
     int receiverId;
     string message;
     string timestamp;

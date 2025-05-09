@@ -1,0 +1,35 @@
+{
+    "chatHistory": [
+        {
+            "message": "Sample message 1 from Meeting Bot about client investment strategy presentation",
+            "receiverId": 0,
+            "senderId": 16781312,
+            "senderName": "Meeting Bot",
+            "timestamp": "1746706344"
+        },
+        {
+            "message": "Sample message 2 from Meeting Bot about client investment strategy presentation",
+            "receiverId": 0,
+            "senderId": 16781312,
+            "senderName": "Meeting Bot",
+            "timestamp": "1746706404"
+        },
+        {
+            "message": "Sample message 3 from Jordan Blake about client investment strategy presentation",
+            "receiverId": 0,
+            "senderId": 16778240,
+            "senderName": "Jordan Blake",
+            "timestamp": "1746706464"
+        },
+        {
+            "message": "Sample message 4 from Jordan Blake about client investment strategy presentation",
+            "receiverId": 0,
+            "senderId": 16778240,
+            "senderName": "Jordan Blake",
+            "timestamp": "1746706524"
+        }
+    ],
+    "meetingNumber": "2874028866",
+    "meetingSummary": "This session focused on presenting a new investment strategy to a major client, outlining expected returns and associated risks.\n\nAction Items:\n*   Send follow-up with performance charts.\n*   Prepare comparison with client's current portfolio.",
+    "meetingTopic": "Client Investment Strategy Presentation"
+}

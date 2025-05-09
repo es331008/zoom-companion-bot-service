@@ -1,0 +1,42 @@
+{
+    "chatHistory": [
+        {
+            "message": "Sample message 1 from Meeting Bot about annual budget forecast review",
+            "receiverId": 0,
+            "senderId": 16781312,
+            "senderName": "Meeting Bot",
+            "timestamp": "1746691944"
+        },
+        {
+            "message": "Sample message 2 from Jordan Blake about annual budget forecast review",
+            "receiverId": 0,
+            "senderId": 16778240,
+            "senderName": "Jordan Blake",
+            "timestamp": "1746692004"
+        },
+        {
+            "message": "Sample message 3 from Rachel Kim about annual budget forecast review",
+            "receiverId": 0,
+            "senderId": 16800001,
+            "senderName": "Rachel Kim",
+            "timestamp": "1746692064"
+        },
+        {
+            "message": "Sample message 4 from Meeting Bot about annual budget forecast review",
+            "receiverId": 0,
+            "senderId": 16781312,
+            "senderName": "Meeting Bot",
+            "timestamp": "1746692124"
+        },
+        {
+            "message": "Sample message 5 from Jordan Blake about annual budget forecast review",
+            "receiverId": 0,
+            "senderId": 16778240,
+            "senderName": "Jordan Blake",
+            "timestamp": "1746692184"
+        }
+    ],
+    "meetingNumber": "2231353183",
+    "meetingSummary": "The team discussed projected expenses and income for the upcoming fiscal year. Adjustments were made based on recent economic indicators.\n\nAction Items:\n*   Finalize the adjusted budget draft.\n*   Submit forecasts to the finance committee.",
+    "meetingTopic": "Annual Budget Forecast Review"
+}

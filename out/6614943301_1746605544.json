@@ -1,0 +1,28 @@
+{
+    "chatHistory": [
+        {
+            "message": "Sample message 1 from Rachel Kim about q2 portfolio rebalancing strategy discussion",
+            "receiverId": 0,
+            "senderId": 16800001,
+            "senderName": "Rachel Kim",
+            "timestamp": "1746605544"
+        },
+        {
+            "message": "Sample message 2 from Rachel Kim about q2 portfolio rebalancing strategy discussion",
+            "receiverId": 0,
+            "senderId": 16800001,
+            "senderName": "Rachel Kim",
+            "timestamp": "1746605604"
+        },
+        {
+            "message": "Sample message 3 from Meeting Bot about q2 portfolio rebalancing strategy discussion",
+            "receiverId": 0,
+            "senderId": 16781312,
+            "senderName": "Meeting Bot",
+            "timestamp": "1746605664"
+        }
+    ],
+    "meetingNumber": "6614943301",
+    "meetingSummary": "This meeting centered on rebalancing the firm's investment portfolio for Q2. Attendees reviewed fixed income performance and discussed adjustments to equity allocations in response to bond yield trends.\n\nAction Items:\n*   Evaluate performance of fixed income holdings.\n*   Recalculate asset allocation model with updated assumptions.\n*   Prepare revised portfolio strategy for review by Friday.",
+    "meetingTopic": "Q2 Portfolio Rebalancing Strategy Discussion"
+}

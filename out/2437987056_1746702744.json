@@ -1,0 +1,35 @@
+{
+    "chatHistory": [
+        {
+            "message": "Sample message 1 from Meeting Bot about annual budget forecast review",
+            "receiverId": 0,
+            "senderId": 16781312,
+            "senderName": "Meeting Bot",
+            "timestamp": "1746702744"
+        },
+        {
+            "message": "Sample message 2 from Rachel Kim about annual budget forecast review",
+            "receiverId": 0,
+            "senderId": 16800001,
+            "senderName": "Rachel Kim",
+            "timestamp": "1746702804"
+        },
+        {
+            "message": "Sample message 3 from Rachel Kim about annual budget forecast review",
+            "receiverId": 0,
+            "senderId": 16800001,
+            "senderName": "Rachel Kim",
+            "timestamp": "1746702864"
+        },
+        {
+            "message": "Sample message 4 from Meeting Bot about annual budget forecast review",
+            "receiverId": 0,
+            "senderId": 16781312,
+            "senderName": "Meeting Bot",
+            "timestamp": "1746702924"
+        }
+    ],
+    "meetingNumber": "2437987056",
+    "meetingSummary": "The team discussed projected expenses and income for the upcoming fiscal year. Adjustments were made based on recent economic indicators.\n\nAction Items:\n*   Finalize the adjusted budget draft.\n*   Submit forecasts to the finance committee.",
+    "meetingTopic": "Annual Budget Forecast Review"
+}

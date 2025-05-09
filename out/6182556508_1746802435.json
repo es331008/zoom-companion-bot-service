@@ -1,0 +1,21 @@
+{
+    "chatHistory": [
+        {
+            "message": "Hi everyone! I'm Meeting Bot, a virtual assistant here to help monitor and support today's session. I'm not a real participant, but I'm here to observe, take notes, or assist with automated tasks if needed. Let me know if there's anything you'd like me to pass along!",
+            "receiverId": 0,
+            "senderId": 16781312,
+            "senderName": "Meeting Bot",
+            "timestamp": "1746802371"
+        },
+        {
+            "message": "Don't forget to schedule lunch!",
+            "receiverId": 0,
+            "senderId": 16778240,
+            "senderName": "Evan Sorger",
+            "timestamp": "1746802424"
+        }
+    ],
+    "meetingNumber": "6182556508",
+    "meetingSummary": "The speaker discusses the need to record a demo and schedule time for it. Additionally, there is a chat message reminding everyone to schedule lunch.\n\nAction Items:\n\n*   Schedule time to record a demo.\n*   Schedule time for lunch.",
+    "meetingTopic": "Evan Sorger's Personal Meeting Room"
+}

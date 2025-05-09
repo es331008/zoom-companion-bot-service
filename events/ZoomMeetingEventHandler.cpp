@@ -25,7 +25,7 @@ void ZoomMeetingEventHandler::onMeetingStatusChanged(MeetingStatus status, int i
         cout << concatOutput << endl;
 
         Client httpClient("localhost", 3000);
-        json body = json{ {"transcript", concatOutput} };
+        json body = json{ {"voiceTranscript", concatOutput}, {"chatTranscript", zoom->meetingInfo.chatHistory} };
 
         auto response = httpClient.Post("/api/zoom/summarize", body.dump(), "application/json");
         if (response && response->status == 200) {

@@ -18,6 +18,7 @@ void ZoomMeetingChatCtrlEventHandler::onChatMsgNotification(IChatMsgInfo* chatMs
 
     ChatMessage msg;
     msg.senderName = zcharToString(chatMsg->GetSenderDisplayName());
+    msg.senderId = chatMsg->GetSenderUserId();
     msg.receiverId = chatMsg->GetReceiverUserId();
     msg.message = zcharToString(chatMsg->GetContent());
     msg.timestamp = timeToString(chatMsg->GetTimeStamp());
