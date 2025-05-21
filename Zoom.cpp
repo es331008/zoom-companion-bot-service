@@ -1,19 +1,5 @@
 #include "Zoom.h"
 
-static bool parseJoinUrl(const std::string& joinUrl, std::string& meetingId, std::string& password) {
-    std::regex urlRegex(R"(https://[\w.-]+/j/(\d+)\?pwd=([\w-]+))");
-    std::smatch match;
-
-    if (std::regex_search(joinUrl, match, urlRegex) && match.size() == 3) {
-        meetingId = match[1].str();
-        password = match[2].str();
-        return true;
-    }
-    return false;
-}
-
-Zoom::Zoom() {}
-
 SDKError Zoom::init() {
     auto host = L"https://zoom.us";
 
@@ -86,7 +72,7 @@ void Zoom::getAuthJwt() {
 SDKError Zoom::join(string joinUrl) {
     string meetingId, password;
 
-    if (parseJoinUrl(joinUrl, meetingId, password)) {
+    if (CompanionUtils::parseJoinUrl(joinUrl, meetingId, password)) {
         auto meetingNumber = stoull(meetingId);
         auto userName = L"Meeting Bot";
         wstring wpassword(password.begin(), password.end());

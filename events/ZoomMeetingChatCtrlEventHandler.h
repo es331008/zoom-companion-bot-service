@@ -9,6 +9,7 @@
 
 #include "meeting_service_components/meeting_chat_interface.h"
 #include "../util/Log.h"
+#include "../util/CompanionUtils.h"
 #include "../structs/MeetingInfo.h"
 #include "../Zoom.h"
 

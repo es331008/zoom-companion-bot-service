@@ -6,6 +6,8 @@
 #include <memory>
 #include <mutex>
 #include <iostream>
+#include "../util/CompanionUtils.h"
+
 #include "../util/Singleton.h"
 #include "../Globals.h"
 

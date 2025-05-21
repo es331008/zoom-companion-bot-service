@@ -36,10 +36,6 @@ void AzureSpeechManager::startStreaming() {
     recognizer_->StartContinuousRecognitionAsync().get();
 }
 
-static inline float clamp(float v, float lo, float hi) {
-    return (v < lo) ? lo : (v > hi) ? hi : v;
-}
-
 void AzureSpeechManager::pushAudio(uint8_t* data, size_t size)
 {
     lock_guard<mutex> lock(mutex_);
@@ -50,7 +46,7 @@ void AzureSpeechManager::pushAudio(uint8_t* data, size_t size)
 
     std::vector<int16_t> pcm16(numSamples);
     for (size_t i = 0; i < numSamples; ++i) {
-        float sample = clamp(floatSamples[i], -1.0f, 1.0f);
+        float sample = CompanionUtils::clamp(floatSamples[i], -1.0f, 1.0f);
         pcm16[i] = static_cast<int16_t>(sample * 32767.0f);
     }
 

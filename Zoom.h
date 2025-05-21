@@ -8,6 +8,7 @@
 
 #include "util/Singleton.h"
 #include "util/Log.h"
+#include "util/CompanionUtils.h"
 
 #include "httplib.h"
 
@@ -23,8 +24,6 @@
 #include "meeting_service_interface.h"
 #include "meeting_service_components/meeting_chat_interface.h"
 #include "meeting_service_components/meeting_recording_interface.h"
-#include "rawdata/rawdata_audio_helper_interface.h"
-#include "rawdata/zoom_rawdata_api.h"
 #include "auth_service_interface.h"
 #include "./virtual-audio/VirtualAudioInterface.h"
 #include "../speech/AzureSpeechManager.h"
@@ -51,22 +50,12 @@ class Zoom : public Singleton<Zoom> {
     SDKError createServices();
     void getAuthJwt();
 
-    // Again, this should be centralized
-    static string zcharToString(const zchar_t* zstr) {
-        if (!zstr) return "";
-
-        std::wstring wstr(zstr);
-        std::wstring_convert<std::codecvt_utf8<wchar_t>> converter;
-        return converter.to_bytes(wstr);
-    }
-
     function<void()> onJoin = [&]() {
         Log::success("Joined meeting!");
         registerChatHandlerAndSendWelcome();
 
-        // Set meeting info
         meetingInfo.meetingNumber = to_string(m_meetingService->GetMeetingInfo()->GetMeetingNumber());
-        meetingInfo.meetingTopic = zcharToString(m_meetingService->GetMeetingInfo()->GetMeetingTopic());
+        meetingInfo.meetingTopic = CompanionUtils::zcharToString(m_meetingService->GetMeetingInfo()->GetMeetingTopic());
 
         AzureSpeechManager::getInstance().startStreaming();
         VirtualAudioInterface::getInstance().start(
@@ -77,11 +66,10 @@ class Zoom : public Singleton<Zoom> {
     };
 
 public:
-    // This stuff should be cleared whenever a new meeting is joined
     MeetingInfo meetingInfo;
     vector<string> recognizedText;
 
-    Zoom();
+    Zoom() {};
     SDKError init();
     SDKError auth();
 
