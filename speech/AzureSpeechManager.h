@@ -19,6 +19,7 @@ public:
     void initialize(const string& key, const string& region);
     void pushAudio(uint8_t* data, size_t size);
     void shutdown();
+    void startStreaming();
 
 private:
     AzureSpeechManager();
@@ -31,6 +32,7 @@ private:
     shared_ptr<Microsoft::CognitiveServices::Speech::Audio::PushAudioInputStream> stream_;
     shared_ptr<Microsoft::CognitiveServices::Speech::Audio::AudioConfig> audioConfig_;
     shared_ptr<Microsoft::CognitiveServices::Speech::SpeechRecognizer> recognizer_;
+    std::atomic<bool> running_;
 };
 
 #endif // AZURE_SPEECH_MANAGER_H

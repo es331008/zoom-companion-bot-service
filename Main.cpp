@@ -117,7 +117,7 @@ int main()
 
         this_thread::sleep_for(chrono::seconds(2));
 
-        Log::info("Starting API server on port 5002...");
+        Log::info("Starting bot server on port 5002...");
         svr.listen("0.0.0.0", 5002);
         });
     serverThread.detach();

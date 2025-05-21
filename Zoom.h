@@ -14,9 +14,7 @@
 #include "zoom_sdk.h"
 #include "./events/ZoomAuthEventHandler.h"
 #include "./events/ZoomMeetingEventHandler.h"
-#include "./events/MeetingRecordingCtrlEventHandler.h"
 #include "./events/ZoomMeetingChatCtrlEventHandler.h"
-#include "./raw/ZoomSDKAudioRawDataDelegate.h"
 #include "./structs/MeetingInfo.h"
 
 #include "json.hpp"
@@ -25,30 +23,30 @@
 #include "meeting_service_interface.h"
 #include "meeting_service_components/meeting_chat_interface.h"
 #include "meeting_service_components/meeting_recording_interface.h"
-//#include "meeting_service_components/meeting_participants_ctrl_interface.h"
 #include "rawdata/rawdata_audio_helper_interface.h"
 #include "rawdata/zoom_rawdata_api.h"
 #include "auth_service_interface.h"
+#include "./virtual-audio/VirtualAudioInterface.h"
+#include "../speech/AzureSpeechManager.h"
 
 using namespace std;
 using namespace ZOOMSDK;
 using namespace httplib;
+using namespace chrono;
 using json = nlohmann::json;
 
-typedef chrono::time_point<chrono::system_clock> time_point;
+typedef time_point<system_clock> ctm_time_point;
 
 class Zoom : public Singleton<Zoom> {
     friend class Singleton<Zoom>;
 
     string m_jwt;
 
-    time_point m_iat;
-    time_point m_exp;
+    ctm_time_point m_iat;
+    ctm_time_point m_exp;
 
     IAuthService* m_authService;
     IMeetingService* m_meetingService;
-    IZoomSDKAudioRawDataHelper* m_audioHelper;
-    ZoomSDKAudioRawDataDelegate* m_audioSource;
 
     SDKError createServices();
     void getAuthJwt();
@@ -62,13 +60,6 @@ class Zoom : public Singleton<Zoom> {
         return converter.to_bytes(wstr);
     }
 
-    function<void(bool)> onRecordingPrivilegeChanged = [&](bool canRec) {
-        if (canRec)
-            startRawRecording();
-        else
-            stopRawRecording();
-    };
-
     function<void()> onJoin = [&]() {
         Log::success("Joined meeting!");
         registerChatHandlerAndSendWelcome();
@@ -77,10 +68,12 @@ class Zoom : public Singleton<Zoom> {
         meetingInfo.meetingNumber = to_string(m_meetingService->GetMeetingInfo()->GetMeetingNumber());
         meetingInfo.meetingTopic = zcharToString(m_meetingService->GetMeetingInfo()->GetMeetingTopic());
 
-        IMeetingRecordingController* recordingCtrl = m_meetingService->GetMeetingRecordingController();
-        IMeetingRecordingCtrlEvent* recordingEvent = new MeetingRecordingCtrlEventHandler(onRecordingPrivilegeChanged);
-        recordingCtrl->SetEvent(recordingEvent);
-        startRawRecording();
+        AzureSpeechManager::getInstance().startStreaming();
+        VirtualAudioInterface::getInstance().start(
+            [&](const BYTE* data, size_t size) {
+                AzureSpeechManager::getInstance().pushAudio(const_cast<BYTE*>(data), size);
+            }
+        );
     };
 
 public:
@@ -96,8 +89,6 @@ public:
     SDKError leave();
 
     SDKError registerChatHandlerAndSendWelcome();
-    SDKError startRawRecording();
-    SDKError stopRawRecording();
 
     SDKError clean();
 

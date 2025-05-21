@@ -65,7 +65,7 @@ SDKError Zoom::auth() {
 }
 
 void Zoom::getAuthJwt() {
-    Client httpClient("localhost", 3000);
+    Client httpClient("localhost", 8000);
 
     auto response = httpClient.Get("/api/auth/generate-sdk-jwt");
     if (response && response->status == 200) {
@@ -143,44 +143,6 @@ SDKError Zoom::registerChatHandlerAndSendWelcome() {
     chatMsgInfoBuilder->SetMessageType(SDKChatMessageType_To_All);
     return meetingChatController->SendChatMsgTo(chatMsgInfoBuilder->Build());
 }
-
-SDKError Zoom::startRawRecording() {
-    Log::info("Starting recording...");
-    IMeetingRecordingController* recCtl = m_meetingService->GetMeetingRecordingController();
-
-    SDKError err = recCtl->CanStartRawRecording();
-    if (hasError(err, "Recording privilege granted")) {
-        Log::info("Requesting local recording privilege");
-        return recCtl->RequestLocalRecordingPrivilege();
-    }
-
-    err = recCtl->StartRawRecording();
-    if (hasError(err, "Started raw recording"))
-        return err;
-
-    m_audioHelper = GetAudioRawdataHelper();
-    if (!m_audioHelper)
-        return SDKERR_UNINITIALIZE;
-
-    if (!m_audioSource) {
-        m_audioSource = new ZoomSDKAudioRawDataDelegate();
-    }
-    
-    err = m_audioHelper->subscribe(m_audioSource);
-    if (hasError(err, "Subscribed to raw audio"))
-        return err;
-
-    return SDKERR_SUCCESS;
-};
-
-SDKError Zoom::stopRawRecording() {
-    Log::info("Stopping recording...");
-    IMeetingRecordingController* recCtrl = m_meetingService->GetMeetingRecordingController();
-    SDKError err = recCtrl->StopRawRecording();
-    hasError(err, "Stopped raw recording");
-
-    return err;
-};
 
 bool Zoom::hasError(const SDKError e, const string& action) {
     auto isError = e != SDKERR_SUCCESS;
