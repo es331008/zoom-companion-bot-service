@@ -27,3 +27,19 @@ bool CompanionUtils::parseJoinUrl(const string& joinUrl, string& meetingId, stri
 string CompanionUtils::timeToString(time_t t) {
     return to_string(t);
 }
+
+bool CompanionUtils::hasSDKError(const SDKError e, const string& onSuccessMsg, const string& onErrorMsg) {
+    auto isError = e != SDKERR_SUCCESS;
+
+    if (!onSuccessMsg.empty()) {
+        if (isError) {
+            stringstream ss;
+            ss << onErrorMsg << "(SDKError " << e << ")";
+            Log::error(ss.str());
+        }
+        else {
+            Log::success(onSuccessMsg);
+        }
+    }
+    return isError;
+}

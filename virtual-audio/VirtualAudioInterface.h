@@ -15,11 +15,20 @@
 using namespace std;
 using namespace chrono;
 
-class VirtualAudioInterface: public Singleton<VirtualAudioInterface> {
-	friend class Singleton<VirtualAudioInterface>;
+class VirtualAudioInterface {
 
     using AudioCallback = std::function<void(const BYTE* data, size_t size)>;
 
+public:
+    VirtualAudioInterface();
+    ~VirtualAudioInterface();
+
+    bool start(AudioCallback audioCallback);
+    void stop();
+    void logWaveFormat(WAVEFORMATEX* pwfx);
+    bool isRunning() const;
+
+private: 
     thread captureThread_;
     atomic<bool> running_;
     atomic<bool> stopRequested_;
@@ -32,14 +41,7 @@ class VirtualAudioInterface: public Singleton<VirtualAudioInterface> {
     IAudioClient* pAudioClient_;
     IAudioCaptureClient* pCaptureClient_;
     WAVEFORMATEX* pwfx_;
-public:
-    bool start(AudioCallback audioCallback);
-    void stop();
-    void logWaveFormat(WAVEFORMATEX* pwfx);
-	bool isRunning() const;
 
-protected:
-    VirtualAudioInterface();
-    ~VirtualAudioInterface();
+
 };
 

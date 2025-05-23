@@ -1,13 +1,14 @@
 #include "AzureSpeechManager.h"
+#include "../bot/BotInstance.h"
 
 using namespace Microsoft::CognitiveServices::Speech;
 using namespace Microsoft::CognitiveServices::Speech::Audio;
 
-AzureSpeechManager::AzureSpeechManager() = default;
-AzureSpeechManager::~AzureSpeechManager() = default;
+AzureSpeechManager::AzureSpeechManager(BotInstance& owner) : owner_(owner) {};
 
 void AzureSpeechManager::initialize(const string& key, const string& region)
 {
+    Log::info("Initializing AzureSpeechManager...");
     lock_guard<mutex> lock(mutex_);
     if (initialized_) return;
 
@@ -21,13 +22,14 @@ void AzureSpeechManager::initialize(const string& key, const string& region)
         cout << "[Azure Recognizing] " << e.Result->Text << endl;
     });
 
-    recognizer_->Recognized.Connect([](const auto& e) {
+    recognizer_->Recognized.Connect([this](const auto& e) {
         cout << "[Azure Recognized] " << e.Result->Text << endl;
 
-        recognizedText.push_back(e.Result->Text);
+        this->owner_.onTextRecognized(e.Result->Text);
     });
 
     initialized_ = true;
+    Log::success("AzureSpeechManager initialized");
 }
 
 void AzureSpeechManager::startStreaming() {

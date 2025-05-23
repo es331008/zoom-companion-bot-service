@@ -1,11 +1,13 @@
 ﻿#include <csignal>
 
-#include "Zoom.h"
-#include "./speech/AzureSpeechManager.h"
-
+#include "./bot/BotManager.h"
 #include "httplib.h"
-#include "zoom_sdk.h"
-#include "zoom_sdk_def.h"
+
+// TODO: Update logging to act more like spring sleuth
+// TODO: Dump meeting info on meeting end (disconnect)
+// TODO: Save meeting info
+// TODO: Convert to use CMAKE and vcpkg
+// TODO: Add unit tests
 
 static void addCORS(Server& svr) {
     svr.Options(R"(.*)", [](const Request& req, Response& res) {
@@ -39,10 +41,8 @@ static void configureRoutes(Server& svr) {
 
             string joinUrl = requestBody["joinUrl"];
 
-            Log::info("Attempting to join meeting: " + joinUrl);
-        
-            auto* zoom = &Zoom::getInstance();
-            zoom->join(joinUrl);
+            auto& botManager = BotManager::getInstance();
+            botManager.startBot(joinUrl);
             
             res.status = 200;
             res.set_content("Joined meeting!", "text/plain");
@@ -54,23 +54,8 @@ static void configureRoutes(Server& svr) {
         });
 }
 
-static void runMessagePump() {
-    Log::info("Starting message pump");
-
-    MSG msg;
-    while (GetMessage(&msg, nullptr, 0, 0)) {
-        TranslateMessage(&msg);
-        DispatchMessage(&msg);
-    }
-
-    Log::info("Message pump ended");
-}
-
 static void onExit() {
-    auto* zoom = &Zoom::getInstance();
-    zoom->leave();
-    zoom->clean();
-    AzureSpeechManager::getInstance().shutdown();
+    // Any cleanup logic goes here
 
     Log::info("Exiting...");
 }
@@ -80,50 +65,16 @@ static void onSignal(int signal) {
     _Exit(signal);
 }
 
-static SDKError run() {
-    SDKError err{ SDKERR_SUCCESS };
-    auto* zoom = &Zoom::getInstance();
-
-    signal(SIGINT, onSignal);
-    signal(SIGTERM, onSignal);
-
-    atexit(onExit);
-
-    err = zoom->init();
-    if (Zoom::hasError(err, "SDK initialization complete"))
-        return err;
-
-    err = zoom->auth();
-    if (Zoom::hasError(err, "SDK authentication started"))
-        return err;
-
-    return err;
-}
-
 int main()
 {
-    SDKError err = run();
+    Server svr;
+    addCORS(svr);
+    configureRoutes(svr);
 
-    if (Zoom::hasError(err))
-        Log::error("error");
+    this_thread::sleep_for(chrono::seconds(2));
 
-    AzureSpeechManager::getInstance().initialize("9dOvrKeS2L1GhSCfcTrGlfrfNYn1bTg3ymEBPtM6e1jreJiRVw9jJQQJ99BEACYeBjFXJ3w3AAAYACOGh7to", "eastus");
-
-    // Message pump runs on the main thread
-    thread serverThread([]() {
-        Server svr;
-        addCORS(svr);
-        configureRoutes(svr);
-
-        this_thread::sleep_for(chrono::seconds(2));
-
-        Log::info("Starting bot server on port 5002...");
-        svr.listen("0.0.0.0", 5002);
-        });
-    serverThread.detach();
-
-    // Zoom uses Windows Message Loop, so we need to pump it constantly on the main thread or else we don't receive events
-    runMessagePump();
+    Log::info("Starting bot server on port 5002...");
+    svr.listen("0.0.0.0", 5002);
 
     return 0;
 }

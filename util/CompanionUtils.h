@@ -1,5 +1,4 @@
-#ifndef COMPANION_UTILS_H
-#define COMPANION_UTILS_H
+#pragma once
 
 #include <string>
 #include <locale>
@@ -7,7 +6,13 @@
 #include <chrono>
 #include <regex>
 
+#include "httplib.h"
+#include "zoom_sdk_def.h"
+
+#include "../util/Log.h"
+
 using namespace std;
+using namespace ZOOMSDK;
 
 class CompanionUtils {
     typedef wchar_t zchar_t;
@@ -19,6 +24,5 @@ public:
     static string zcharToString(const zchar_t* zstr);
     static bool parseJoinUrl(const std::string& joinUrl, std::string& meetingId, std::string& password);
     static string timeToString(time_t t);
+    static bool hasSDKError(const SDKError e, const string& onSuccessMsg, const string& onErrorMsg);
 };
-
-#endif // COMPANION_UTILS_H
