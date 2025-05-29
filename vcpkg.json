@@ -1,0 +1,8 @@
+{
+    "name": "zoom-companion-bot",
+    "version": "0.1.0",
+    "dependencies": [
+        "cpp-httplib",
+        "nlohmann-json"
+    ]
+}

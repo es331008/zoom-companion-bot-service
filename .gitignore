@@ -1,5 +1,6 @@
 .vs
-zoom-sdk
-zoom-com*
+external
 x64
 packages
+build
+vcpkg_installed

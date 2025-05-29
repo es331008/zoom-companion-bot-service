@@ -1,7 +1,7 @@
 #pragma once
 
-#include "httplib.h"
-#include "json.hpp"
+#include <httplib.h>
+#include <nlohmann/json.hpp>
 #include "zoom_sdk.h"
 #include "auth_service_interface.h"
 #include "meeting_service_interface.h"

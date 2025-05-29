@@ -1,12 +1,11 @@
 ﻿#include <csignal>
 
 #include "./bot/BotManager.h"
-#include "httplib.h"
+#include <httplib.h>
 
 // TODO: Update logging to act more like spring sleuth
 // TODO: Dump meeting info on meeting end (disconnect)
 // TODO: Save meeting info
-// TODO: Convert to use CMAKE and vcpkg
 // TODO: Add unit tests
 
 static void addCORS(Server& svr) {
