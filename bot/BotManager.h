@@ -24,4 +24,5 @@ private:
 
     mutex mutex_;
     unordered_map<string, unique_ptr<BotInstance>> bots_;
+    std::unordered_map<std::string, std::thread> botThreads_;
 };

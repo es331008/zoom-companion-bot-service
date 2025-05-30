@@ -102,13 +102,16 @@ SDKError ZoomClient::joinMeeting(const string &joinUrl) {
 }
 
 void ZoomClient::clean() {
+    Log::info("Cleaning up Zoom client");
+
     if (meetingService_)
         DestroyMeetingService(meetingService_);
 
     if (authService_)
         DestroyAuthService(authService_);
 
-    CleanUPSDK();
+    auto err = CleanUPSDK();
+    if (CompanionUtils::hasSDKError(err, "Cleanup", "Cleanup failed"));
 }
 
 SDKError ZoomClient::configureChatController() {

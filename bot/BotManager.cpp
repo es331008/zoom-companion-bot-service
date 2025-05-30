@@ -10,9 +10,15 @@ string BotManager::startBot(const string& joinUrl) {
         Log::info("Starting bot_" + meetingId);
         auto bot = make_unique<BotInstance>(joinUrl);
         bot->setShutdownCallback([this, botId](BotInstance* instance) {
-            this->stopBot(botId);
+            thread([this, botId]() {
+                this->stopBot(botId);
+                }).detach();
+            });
+
+        botThreads_[botId] = thread([botPtr = bot.get()]() {
+            botPtr->start();
         });
-        bot->start();
+
         bots_[botId] = move(bot);
 
         return botId;
@@ -23,11 +29,31 @@ string BotManager::startBot(const string& joinUrl) {
 }
 
 void BotManager::stopBot(const string& botId) {
-    lock_guard<mutex> lock(mutex_);
+    unique_ptr<BotInstance> bot;
+    thread botThread;
 
-    if (bots_.count(botId)) {
-        bots_[botId]->stop();
-        bots_.erase(botId);
+    Log::info("Stopping bot_" + botId);
+
+    {
+        lock_guard<mutex> lock(mutex_);
+        if (bots_.count(botId)) {
+            bot = move(bots_[botId]);
+            bots_.erase(botId);
+
+            botThread = move(botThreads_[botId]);
+            botThreads_.erase(botId);
+        }
+        else {
+            return;
+        }
+    }
+
+    if (bot) {
+        bot->stop();
+    }
+
+    if (botThread.joinable() && botThread.get_id() != this_thread::get_id()) {
+        botThread.join();
     }
 }
 
@@ -39,8 +65,8 @@ void BotManager::stopAllBots() {
     bots_.clear();
 }
 
-BotStatus BotManager::getBotStatus(const std::string& botId) {
-    std::lock_guard<std::mutex> lock(mutex_);
+BotStatus BotManager::getBotStatus(const string& botId) {
+    lock_guard<mutex> lock(mutex_);
     if (bots_.count(botId)) {
         return bots_[botId]->getStatus();
     }

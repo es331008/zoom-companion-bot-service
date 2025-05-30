@@ -17,7 +17,8 @@ void BotInstance::start() {
     if (running_) return;
     running_ = true;
 
-    botThread_ = thread(&BotInstance::runBot, this);
+    //botThread_ = thread(&BotInstance::runBot, this);
+    runBot();
 }
 
 void BotInstance::stop() {
@@ -28,10 +29,6 @@ void BotInstance::stop() {
     azureSpeechManager_->shutdown();
     virtualAudioInterface_->stop();
     zoomClient_->clean();
-
-    // TODO: Fix this thread deadlock caused by it trying to join itself
-    if (botThread_.joinable())
-        botThread_.join();
 }
 
 bool BotInstance::isRunning() const {

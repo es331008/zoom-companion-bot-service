@@ -58,6 +58,7 @@ void AzureSpeechManager::pushAudio(uint8_t* data, size_t size)
 void AzureSpeechManager::shutdown()
 {
     lock_guard<mutex> lock(mutex_);
+    Log::info("Shutting down AzureSpeechManager");
     if (recognizer_) {
         recognizer_->StopContinuousRecognitionAsync().get();
     }

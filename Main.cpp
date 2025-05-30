@@ -7,6 +7,8 @@
 // TODO: Dump meeting info on meeting end (disconnect)
 // TODO: Save meeting info
 // TODO: Add unit tests
+// TODO: Generate JWT internally
+// TODO: Fix cleanup process - it's not doing what it should
 
 static void addCORS(Server& svr) {
     svr.Options(R"(.*)", [](const Request& req, Response& res) {

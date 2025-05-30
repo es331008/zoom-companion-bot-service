@@ -69,6 +69,7 @@ bool VirtualAudioInterface::start(AudioCallback audioCallback) {
 void VirtualAudioInterface::stop() {
     if (!running_) return;
 
+    Log::info("Shutting down virtual audio interface");
     stopRequested_ = true;
     if (captureThread_.joinable())
         captureThread_.join();
